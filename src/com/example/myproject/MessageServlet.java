@@ -32,6 +32,32 @@ public class MessageServlet extends TwitterAPI2Servlet {
 		//Search the datastore for the ID
 		//If ID is found, write out the information with a sucessful response
 		// else write an error resposne
+		DatastoreService datastore = 
+                DatastoreServiceFactory.getDatastoreService();
+		String messageID = request.getQueryString();
+		if (messageID != null){
+			response.setContentType("application/json");
+			Key messageKey = KeyFactory.createKey(MessageServlet.MessageType, userID);
+			Entity userProfile;
+			try {
+				messageProfile = datastore.get(messageKey);
+				Gson json = new Gson();
+				String returnString = json.toJson(messageProfile);
+				response.getWriter().println(returnString);
+
+			} catch (EntityNotFoundException e) {
+				this.writeErrorResponse(response, "Error, user does not exist");
+			}
+		}else{
+			//Uncomment if your datastore is empty.
+			//Reminder you can view your datastore at http:localhost:xxxx/_ah/admin where xxxx is your port
+			/*Entity testEnt = new Entity(UserServlet.UserType);
+			testEnt.setProperty(UserServlet.nameParam, "Victor");
+			testEnt.setProperty(UserServlet.userHandlerParam , "Coldsoldier");
+			testEnt.setProperty(UserServlet.userIDParam, 12432);
+			datastore.put(testEnt);
+			this.writeErrorResponse(response, "Error no user ID found");*/
+		}
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
